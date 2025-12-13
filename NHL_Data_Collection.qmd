@@ -225,6 +225,7 @@ rankings <- bind_rows(rankings_list) |>
   filter(positionCode != "G") |> distinct(fullName, .keep_all = TRUE)
 head(rankings)
 dim(rankings)
+write.csv(rankings, "nhl_prospect_rankings.csv", row.names = F)
 
 ```
 
@@ -407,6 +408,7 @@ nhl_drafts <- nhl_drafts |>
   distinct(Player, .keep_all = TRUE)
 head(nhl_drafts)
 dim(nhl_drafts)
+write.csv(nhl_drafts, "nhl_draft_history.csv", row.names = F)
 
 ```
 
@@ -523,13 +525,12 @@ df_test_temp <- testing(df_split)
 test_ids <- df_test_temp |> select(ID) # save names to rebind to test predictions
 df_train <- df_train_temp |> select(-ID)
 df_test <- df_test_temp |> select(-ID)
-df_test
+head(df_test)
 ```
 
 ## LASSO Regression
 
 ```{r lasso}
-set.seed(499)
 # MODEL FITTING
 lasso_rec <- recipe(flurryAdjCareerXGoals ~ ., data = df_train) |>
   step_dummy(all_nominal_predictors()) |>
@@ -567,6 +568,14 @@ spotlight_preds <- lasso_preds_df |>
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
 kable(spotlight_preds, caption = "LASSO Model Predictions")
+
+lasso_res_scatter <- ggplot(lasso_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, LASSO Model",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+lasso_res_scatter
+ggsave("lasso_res_scatter.png", lasso_res_scatter)
 rmse(lasso_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 
 ```
@@ -574,7 +583,6 @@ rmse(lasso_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 ## Mixed LASSO/Ridge
 
 ```{r mixed}
-set.seed(499)
 mixed_spec <- linear_reg(penalty = tune(), mixture = 0.5) |>
   set_engine("glmnet") # mixed model
 mixed_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(mixed_spec)
@@ -583,6 +591,7 @@ mixed_results <- tune_grid(mixed_wf,
                            grid = lambda_grid,
                            metrics = metric_set(rmse))
 best_mixed <- select_best(mixed_results, metric = "rmse")
+summary(best_mixed)
 final_mixed <- finalize_workflow(mixed_wf, best_mixed)
 final_mixed_fit <- fit(final_mixed, data = df_train)
 mixed_coef_table <- tidy(final_mixed_fit) |> filter(estimate != 0)
@@ -604,13 +613,19 @@ spotlight_preds_mixed <- mixed_preds_df |>
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
 kable(spotlight_preds_mixed, caption = "Mixed Model Predictions")
+mixed_res_scatter <- ggplot(mixed_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, Mixed LASSO/Ridge Model",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+mixed_res_scatter
+ggsave("mixed_res_scatter.png", mixed_res_scatter)
 rmse(mixed_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 ```
 
 ## Ridge Regression
 
 ```{r ridge}
-set.seed(499)
 ridge_spec <- linear_reg(penalty = tune(), mixture = 0) |>
   set_engine("glmnet") # mixed model
 ridge_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(ridge_spec)
@@ -619,6 +634,7 @@ ridge_results <- tune_grid(ridge_wf,
                            grid = lambda_grid,
                            metrics = metric_set(rmse))
 best_ridge <- select_best(ridge_results, metric = "rmse")
+best_ridge
 final_ridge <- finalize_workflow(ridge_wf, best_ridge)
 final_ridge_fit <- fit(final_ridge, data = df_train)
 ridge_coef_table <- tidy(final_ridge_fit) |> filter(estimate != 0)
@@ -640,14 +656,19 @@ spotlight_preds_ridge <- ridge_preds_df |>
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
 kable(spotlight_preds_ridge, caption = "Ridge Model Predictions")
+ridge_res_scatter <- ggplot(ridge_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, Ridge Model",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+ridge_res_scatter
+ggsave("ridge_res_scatter.png", ridge_res_scatter)
 rmse(ridge_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 ```
 
 ## Boosted Tree Method
 
 ```{r boostedtrees}
-set.seed(499)
-df_test
 boost_spec <- boost_tree(
   trees = 1000,
   learn_rate = tune(),
@@ -659,17 +680,17 @@ boost_tune_grid <- grid_regular(learn_rate(range = c(0.001, 0.25)),
 boost_results <- tune_grid(boost_wf, resamples = df_10foldcv,
                            grid = boost_tune_grid, metrics = metric_set(rmse))
 best_boost <- select_best(boost_results, metric = "rmse")
+best_boost
 final_boost <- finalize_workflow(boost_wf, best_boost)
 final_boost_fit <- fit(final_boost, data = df_train)
 vip_boost <- vip(final_boost_fit) + 
   labs(title = "Variable Importance - Boosted Trees") + theme_bw()
 vip_boost
-#ggsave("vip_boost.png", vip_boost)
+ggsave("vip_boost.png", vip_boost)
 boost_preds <- predict(final_boost_fit, new_data = df_test) |>
   bind_cols(df_test)
 boost_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
                             Estimate = boost_preds$.pred)
-boost_preds_df
 spotlight_preds_boost <- boost_preds_df |>
   filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
                    "2013-Bo Horvat", "2013-Nathan MacKinnon",
@@ -677,17 +698,22 @@ spotlight_preds_boost <- boost_preds_df |>
   summarize(ID = ID,
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
-kable(spotlight_preds_boost, caption = "Boosted Tree Model Predictions")
+kable(spotlight_preds_boost, caption = "Boost Model Predictions")
+boost_res_scatter <- ggplot(boost_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, Boosted Trees",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+boost_res_scatter
+ggsave("boost_res_scatter.png", boost_res_scatter)
 rmse(boost_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 ```
 
 ## Bagging
 
 ```{r randForest}
-set.seed(499)
 df_predictors <- ncol(df_train) - 1
-bag_spec <- rand_forest(trees = 1000, mtry = df_predictors,
-                        min_n = tune()) |>
+bag_spec <- rand_forest(trees = 1000, mtry = df_predictors) |>
   set_mode("regression") |> set_engine("ranger",
                                        importance = "permutation")
 
@@ -700,6 +726,7 @@ vip_bag
 ggsave("vip_bag.png", vip_bag)
 bag_preds <- predict(bag_fit, new_data = df_test) |>
   bind_cols(df_test)
+bag_preds
 bag_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
                             Estimate = bag_preds$.pred)
 spotlight_preds_bag <- bag_preds_df |>
@@ -710,13 +737,20 @@ spotlight_preds_bag <- bag_preds_df |>
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
 kable(spotlight_preds_bag, caption = "Bagging Model Predictions")
+bag_res_scatter <- ggplot(bag_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, Bagged Forest",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+bag_res_scatter
+ggsave("bag_res_scatter.png", bag_res_scatter)
+
 rmse(bag_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
 ```
 
 ## Random Forest
 
 ```{r}
-set.seed(499)
 rf_spec <- rand_forest(trees = 1000,
                        mode = "regression",
                        mtry = sqrt(df_predictors)) |>
@@ -725,7 +759,7 @@ rf_fit <- rf_spec |> fit(flurryAdjCareerXGoals ~., data = df_train)
 vip_rf <- vip(rf_fit) + labs(title = "Variable Importance - Random Forest") +
   theme_bw()
 vip_rf
-#ggsave("vip_rf.png", vip_rf)
+ggsave("vip_rf.png", vip_rf)
 rf_preds <- predict(rf_fit, new_data = df_test) |>
   bind_cols(df_test)
 rf_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
@@ -738,7 +772,13 @@ spotlight_preds_rf <- rf_preds_df |>
             Actual = round(Actual,2),
             Estimate = round(Estimate,2))
 kable(spotlight_preds_rf, caption = "Random Forest Model Predictions")
+rf_res_scatter <- ggplot(rf_preds_df, aes(x = Actual, y = Estimate)) +
+  geom_point(alpha = 0.33) + 
+  labs(title = "Actual vs Predicted Flurry Adj Exp. Goals, Random Forest",
+       x = "Actual Flurry Adj Expected Goals",
+       y = "Predicted Flurry Adj Expected Goals") + theme_bw()
+rf_res_scatter
+ggsave("rf_res_scatter.png", rf_res_scatter)
 rmse(rf_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
-
 
 ```
