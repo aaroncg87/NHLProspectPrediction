@@ -1,0 +1,744 @@
+---
+title: "NHLProspectRankings"
+format: pdf
+editor: visual
+---
+
+## Libraries
+
+```{r}
+set.seed(499)
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(xml2)
+library(rvest)
+library(janitor)
+library(tidyverse)
+library(jsonlite)
+library(fuzzyjoin)
+library(stringdist)
+library(tidymodels)
+library(glmnet)
+library(yardstick)
+library(vip)
+library(knitr)
+library(ranger)
+library(randomForest)
+```
+
+# Load NHL Prospect Rankings (2008-2025)
+
+```{r}
+# 2008
+
+url_2008 <- "https://api-web.nhle.com/v1/draft/rankings/2008/1"
+
+prospect_rank_2008_raw <- fromJSON(url_2008, simplifyDataFrame = TRUE)
+
+prospect_rank_2008 <- prospect_rank_2008_raw$rankings |>
+  mutate(Year = as.factor(2008))
+head(prospect_rank_2008)
+
+# 2009
+
+url_2009 <- "https://api-web.nhle.com/v1/draft/rankings/2009/1"
+
+prospect_rank_2009_raw <- fromJSON(url_2009, simplifyVector = TRUE)
+
+prospect_rank_2009 <- prospect_rank_2009_raw$rankings |>
+  mutate(Year = as.factor(2009))
+head(prospect_rank_2009)
+
+# 2010
+
+url_2010 <- "https://api-web.nhle.com/v1/draft/rankings/2010/1"
+
+prospect_rank_2010_raw <- fromJSON(url_2010, simplifyVector = TRUE)
+
+prospect_rank_2010 <- prospect_rank_2010_raw$rankings |>
+  mutate(Year = as.factor(2010))
+head(prospect_rank_2010)
+
+# 2011
+
+url_2011 <- "https://api-web.nhle.com/v1/draft/rankings/2011/1"
+
+prospect_rank_2011_raw <- fromJSON(url_2011, simplifyVector = TRUE)
+
+prospect_rank_2011 <- prospect_rank_2011_raw$rankings |>
+  mutate(Year = as.factor(2011))
+head(prospect_rank_2011)
+
+# 2012
+
+url_2012 <- "https://api-web.nhle.com/v1/draft/rankings/2012/1"
+
+prospect_rank_2012_raw <- fromJSON(url_2012, simplifyVector = TRUE)
+
+prospect_rank_2012 <- prospect_rank_2012_raw$rankings |>
+  mutate(Year = as.factor(2012))
+head(prospect_rank_2012)
+
+# 2013
+
+url_2013 <- "https://api-web.nhle.com/v1/draft/rankings/2013/1"
+
+prospect_rank_2013_raw <- fromJSON(url_2013, simplifyVector = TRUE)
+
+prospect_rank_2013 <- prospect_rank_2013_raw$rankings |>
+  mutate(Year = as.factor(2013))
+head(prospect_rank_2013)
+
+# 2014
+
+url_2014 <- "https://api-web.nhle.com/v1/draft/rankings/2014/1"
+
+prospect_rank_2014_raw <- fromJSON(url_2014, simplifyVector = TRUE)
+
+prospect_rank_2014 <- prospect_rank_2014_raw$rankings |>
+  mutate(Year = as.factor(2014))
+head(prospect_rank_2014)
+
+# 2015
+
+url_2015 <- "https://api-web.nhle.com/v1/draft/rankings/2015/1"
+
+prospect_rank_2015_raw <- fromJSON(url_2015, simplifyVector = TRUE)
+
+prospect_rank_2015 <- prospect_rank_2015_raw$rankings |>
+  mutate(Year = as.factor(2015))
+head(prospect_rank_2015)
+
+# 2016
+
+url_2016 <- "https://api-web.nhle.com/v1/draft/rankings/2016/1"
+
+prospect_rank_2016_raw <- fromJSON(url_2016, simplifyVector = TRUE)
+
+prospect_rank_2016 <- prospect_rank_2016_raw$rankings |>
+  mutate(Year = as.factor(2016))
+head(prospect_rank_2016)
+
+# 2017
+
+url_2017 <- "https://api-web.nhle.com/v1/draft/rankings/2017/1"
+
+prospect_rank_2017_raw <- fromJSON(url_2017, simplifyVector = TRUE)
+
+prospect_rank_2017 <- prospect_rank_2017_raw$rankings |>
+  mutate(Year = as.factor(2017))
+head(prospect_rank_2017)
+
+# 2018
+
+url_2018 <- "https://api-web.nhle.com/v1/draft/rankings/2018/1"
+
+prospect_rank_2018_raw <- fromJSON(url_2018, simplifyVector = TRUE)
+
+prospect_rank_2018 <- prospect_rank_2018_raw$rankings |>
+  mutate(Year = as.factor(2018))
+head(prospect_rank_2018)
+
+# 2019
+
+url_2019 <- "https://api-web.nhle.com/v1/draft/rankings/2019/1"
+
+prospect_rank_2019_raw <- fromJSON(url_2019, simplifyVector = TRUE)
+
+prospect_rank_2019 <- prospect_rank_2019_raw$rankings |>
+  mutate(Year = as.factor(2019))
+head(prospect_rank_2019)
+
+# 2020
+
+url_2020 <- "https://api-web.nhle.com/v1/draft/rankings/2020/1"
+
+prospect_rank_2020_raw <- fromJSON(url_2020, simplifyVector = TRUE)
+
+prospect_rank_2020 <- prospect_rank_2020_raw$rankings |>
+  mutate(Year = as.factor(2020))
+head(prospect_rank_2020)
+
+# 2021
+
+url_2021 <- "https://api-web.nhle.com/v1/draft/rankings/2021/1"
+
+prospect_rank_2021_raw <- fromJSON(url_2021, simplifyVector = TRUE)
+
+prospect_rank_2021 <- prospect_rank_2021_raw$rankings |>
+  mutate(Year = as.factor(2021))
+head(prospect_rank_2021)
+
+# 2022
+
+url_2022 <- "https://api-web.nhle.com/v1/draft/rankings/2022/1"
+
+prospect_rank_2022_raw <- fromJSON(url_2022, simplifyVector = TRUE)
+
+prospect_rank_2022 <- prospect_rank_2022_raw$rankings |>
+  mutate(Year = as.factor(2022))
+head(prospect_rank_2022)
+
+# 2023
+
+url_2023 <- "https://api-web.nhle.com/v1/draft/rankings/2023/1"
+
+prospect_rank_2023_raw <- fromJSON(url_2023, simplifyVector = TRUE)
+
+prospect_rank_2023 <- prospect_rank_2023_raw$rankings |>
+  mutate(Year = as.factor(2023))
+head(prospect_rank_2023)
+
+# 2025
+
+url_2024 <- "https://api-web.nhle.com/v1/draft/rankings/2024/1"
+
+prospect_rank_2024_raw <- fromJSON(url_2024, simplifyVector = TRUE)
+
+prospect_rank_2024 <- prospect_rank_2024_raw$rankings |>
+  mutate(Year = as.factor(2024))
+head(prospect_rank_2024)
+
+
+```
+
+## Clean Rankings
+
+```{r}
+rankings_list <- list(prospect_rank_2008, prospect_rank_2009,
+                               prospect_rank_2010, prospect_rank_2011,
+                               prospect_rank_2012, prospect_rank_2013,
+                               prospect_rank_2014, prospect_rank_2015,
+                               prospect_rank_2016, prospect_rank_2017,
+                               prospect_rank_2018, prospect_rank_2019,
+                               prospect_rank_2020, prospect_rank_2021,
+                               prospect_rank_2022, prospect_rank_2023,
+                               prospect_rank_2024)
+rankings <- bind_rows(rankings_list) |>
+  mutate(fullName = paste0(firstName, " ", lastName),
+         ovrRank = rowMeans(cbind(midtermRank, finalRank), na.rm = T),
+         birthDate = as.Date(birthDate, format = "%Y-%m-%d"),
+         ID = paste0(Year, "-", fullName)) |>
+  select(-c(birthStateProvince, birthCity, lastName, firstName, midtermRank,
+            finalRank)) |>
+  filter(positionCode != "G") |> distinct(fullName, .keep_all = TRUE)
+head(rankings)
+dim(rankings)
+
+```
+
+```{r}
+# League Frequency
+training_league_freq <- table(rankings$lastAmateurLeague)
+training_league_freq_sorted <- sort(training_league_freq, decreasing = TRUE)
+head(training_league_freq_sorted, 10)
+```
+
+# Load NHL Draft Data
+
+```{r}
+# 2008
+nhl_draft_2008 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2008.csv")
+cleaned_nhl_draft_2008 <- nhl_draft_2008 |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |>
+  mutate(Year = as.factor(2008))
+head(cleaned_nhl_draft_2008)
+
+# 2009
+
+nhl_draft_2009 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2009.csv")
+cleaned_nhl_draft_2009 <- nhl_draft_2009 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |>
+  mutate(Year = as.factor(2009))
+head(cleaned_nhl_draft_2009)
+
+# 2010
+
+nhl_draft_2010 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2010.csv")
+cleaned_nhl_draft_2010 <- nhl_draft_2010 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |>
+  mutate(Year = as.factor(2010))
+head(cleaned_nhl_draft_2010)
+
+# 2011
+
+nhl_draft_2011 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2011.csv")
+cleaned_nhl_draft_2011 <- nhl_draft_2011 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |>
+  mutate(Year = as.factor(2011))
+
+head(cleaned_nhl_draft_2011)
+
+# 2012
+
+nhl_draft_2012 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2012.csv")
+cleaned_nhl_draft_2012 <- nhl_draft_2012 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |>
+  mutate(Year = as.factor(2012))
+
+head(cleaned_nhl_draft_2012)
+
+# 2013
+
+nhl_draft_2013 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2013.csv")
+cleaned_nhl_draft_2013 <- nhl_draft_2013 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2013))
+head(cleaned_nhl_draft_2013)
+
+# 2014
+
+nhl_draft_2014 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2014.csv")
+cleaned_nhl_draft_2014 <- nhl_draft_2014 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2014))
+head(cleaned_nhl_draft_2014)
+
+# 2015
+
+nhl_draft_2015 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2015.csv")
+cleaned_nhl_draft_2015 <- nhl_draft_2015 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2015))
+head(cleaned_nhl_draft_2015)
+
+
+
+# 2016
+
+nhl_draft_2016 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2016.csv")
+cleaned_nhl_draft_2016 <- nhl_draft_2016 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2016))
+head(cleaned_nhl_draft_2016)
+
+# 2017
+
+nhl_draft_2017 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2017.csv")
+cleaned_nhl_draft_2017 <- nhl_draft_2017 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2017))
+head(cleaned_nhl_draft_2017)
+
+
+# 2018
+
+nhl_draft_2018 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2018.csv")
+cleaned_nhl_draft_2018 <- nhl_draft_2018 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2018))
+head(cleaned_nhl_draft_2018)
+
+# 2019
+
+nhl_draft_2019 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2019.csv")
+cleaned_nhl_draft_2019 <- nhl_draft_2019 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2019))
+head(cleaned_nhl_draft_2019)
+
+# 2020
+
+nhl_draft_2020 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2020.csv")
+cleaned_nhl_draft_2020 <- nhl_draft_2020 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2020))
+head(cleaned_nhl_draft_2020)
+
+# 2021
+
+nhl_draft_2021 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2021.csv")
+cleaned_nhl_draft_2021 <- nhl_draft_2021 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2021))
+head(cleaned_nhl_draft_2021)
+
+# 2022
+
+nhl_draft_2022 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2022.csv")
+cleaned_nhl_draft_2022 <- nhl_draft_2022 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2022))
+head(cleaned_nhl_draft_2022)
+
+# 2023
+
+nhl_draft_2023 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2023.csv")
+cleaned_nhl_draft_2023 <- nhl_draft_2023 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2023))
+head(cleaned_nhl_draft_2023)
+
+
+# 2024
+
+nhl_draft_2024 <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhldraft_2024.csv")
+cleaned_nhl_draft_2024 <- nhl_draft_2024 |> filter(Pos != "G") |>
+  select(-c("GP.1", "W", "L", "T.O", "SV.", "GAA")) |>
+  rename(P_M = "X...") |> mutate(Year = as.factor(2024))
+head(cleaned_nhl_draft_2024)
+
+```
+
+## Merge NHL Draft Data
+
+```{r}
+draft_list <- list(cleaned_nhl_draft_2008, cleaned_nhl_draft_2009,
+                      cleaned_nhl_draft_2010, cleaned_nhl_draft_2011,
+                      cleaned_nhl_draft_2012, cleaned_nhl_draft_2013,
+                      cleaned_nhl_draft_2014, cleaned_nhl_draft_2014,
+                      cleaned_nhl_draft_2015, cleaned_nhl_draft_2016,
+                      cleaned_nhl_draft_2017, cleaned_nhl_draft_2018,
+                      cleaned_nhl_draft_2019, cleaned_nhl_draft_2020,
+                      cleaned_nhl_draft_2021, cleaned_nhl_draft_2022,
+                   cleaned_nhl_draft_2023, cleaned_nhl_draft_2024)
+nhl_drafts <- bind_rows(draft_list) 
+
+# Convert Na stats to 0
+nhl_drafts <- nhl_drafts |>
+  mutate(ID = paste0(Year,"-", Player)) |>
+  mutate(across(c(GP, G, A, PTS, P_M, PIM, PS), ~ replace_na(., 0))) |>
+  distinct(Player, .keep_all = TRUE)
+head(nhl_drafts)
+dim(nhl_drafts)
+
+```
+
+# Elite Prospects Data
+
+```{r}
+prospect_stats <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/EliteProspectsDataV2.csv")
+head(prospect_stats)
+```
+
+# Career Expected Goals (NHL)
+
+```{r}
+nhl_exp_goals <- read.csv("C:/Users/agraf/OneDrive/Documents/Honors Thesis/Raw Data/nhl_flurry_adj_goals_careers.csv")
+head(nhl_exp_goals)
+```
+
+# Joining Datasets
+
+## Rankings to Draft
+
+```{r}
+
+hockey_ref_rankings_data <- stringdist_left_join(rankings, nhl_drafts,
+                                                 by = "ID",
+                                                 method = "jw",
+                                                 max_dist = 0.15)
+
+# handle duplicates by keeping most similar rows
+hockey_ref_rankings_data_joined <- hockey_ref_rankings_data |>
+  slice_min(order_by = stringdist::stringdist(fullName, Player, method = "jw"))
+head(hockey_ref_rankings_data_joined)
+hockey_ref_rankings_data_temp <- hockey_ref_rankings_data |>
+  select(ID.x, Overall, ovrRank, Team, fullName, positionCode, Age, birthDate, Nat.,
+         shootsCatches, heightInInches, weightInPounds, lastAmateurClub,
+         lastAmateurLeague, Year.x) |>
+  rename(Year = "Year.x", shoots = "shootsCatches", Pos = "positionCode",
+         ID = "ID.x") |> distinct(ID, .keep_all = TRUE)
+  #arrange(-desc(Overall))
+rank_draft <- hockey_ref_rankings_data_temp |>
+  filter(!is.na(Team),
+         !is.na(Overall))
+head(rank_draft)
+dim(rank_draft)
+```
+
+## Rankings-Draft to EliteProspects
+
+```{r}
+rank_draft_ep_lj <- left_join(rank_draft, prospect_stats, by = "ID")
+head(rank_draft_ep_lj)
+rank_draft_ep_joined_temp <- rank_draft_ep_lj |>
+  select(ID, Overall, ovrRank, Team.x, fullName, Pos, Age, birthDate,
+         Nat., shoots, heightInInches, weightInPounds, lastAmateurClub,
+         lastAmateurLeague, DraftYear, League, Team.y, GamesPlayed, Goals, Assists,
+         TotalPoints, PointsPerGame, PenaltyMinutes, PlusMinus) |>
+  rename(NHL_team = "Team.x", preNHL_team = "Team.y", name = "fullName") |> 
+  distinct(ID, .keep_all = TRUE)
+  #arrange(-desc(Overall))
+rank_draft_ep <- rank_draft_ep_joined_temp |>
+  filter(!is.na(NHL_team),
+         !is.na(Overall),
+         !is.na(ovrRank),
+         !is.na(Age),
+         !is.na(preNHL_team),
+         !is.na(GamesPlayed),
+         !is.na(Goals),
+         !is.na(Assists),
+         !is.na(TotalPoints),
+         !is.na(PointsPerGame),
+         !is.na(PenaltyMinutes)) |>
+  mutate(NHL_team = as.factor(NHL_team),
+         Pos = as.factor(Pos),
+         birthMonth = as.numeric(substr(birthDate, start = 6, stop = 7)),
+         Nat. = as.factor(Nat.),
+         shoots = as.factor(shoots),
+         DraftYear = as.factor(DraftYear),
+         lastAmateurLeague = as.factor(League),
+         lastAmateurTeam = as.factor(preNHL_team),
+         PlusMinus = if_else(PlusMinus == "-", "0", PlusMinus),
+         GamesPlayed = as.numeric(GamesPlayed),
+         Goals = as.numeric(Goals),
+         Assists = as.numeric(Assists),
+         TotalPoints = as.numeric(TotalPoints),
+         PointsPerGame = as.numeric(PointsPerGame),
+         PenaltyMinutes = as.numeric(PenaltyMinutes),
+         PlusMinus = as.numeric(PlusMinus)) |>
+  select(-c(lastAmateurClub, preNHL_team, League, birthDate)) |>
+  filter(!is.na(PlusMinus))
+head(rank_draft_ep)
+dim(rank_draft_ep)
+```
+
+## Add Career Expected Goals (Response)
+
+```{r}
+final_df <- left_join(rank_draft_ep, nhl_exp_goals, by = "name") |>
+  distinct(ID, .keep_all = TRUE) |>
+  mutate(flurryAdjCareerXGoals = if_else(is.na(I_F_flurryAdjustedxGoals),
+                                         0, I_F_flurryAdjustedxGoals)) |>
+  select(-c(playerId, name, games_played, I_F_flurryAdjustedxGoals))
+head(final_df)
+dim(final_df)
+```
+
+# Modeling
+
+## Train-Test Split
+
+```{r}
+df_split <- initial_split(final_df, prop = 0.8)
+df_train_temp <- training(df_split)
+df_test_temp <- testing(df_split)
+test_ids <- df_test_temp |> select(ID) # save names to rebind to test predictions
+df_train <- df_train_temp |> select(-ID)
+df_test <- df_test_temp |> select(-ID)
+df_test
+```
+
+## LASSO Regression
+
+```{r lasso}
+set.seed(499)
+# MODEL FITTING
+lasso_rec <- recipe(flurryAdjCareerXGoals ~ ., data = df_train) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_zv(all_predictors()) |>
+  step_normalize(all_numeric_predictors())
+lasso_spec <- linear_reg(penalty = tune(), mixture = 1) |>
+  set_engine("glmnet") # pure lasso model
+lasso_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(lasso_spec)
+df_10foldcv <- vfold_cv(df_train, v = 10)
+lambda_grid <- grid_regular(penalty(), levels = 30)
+lasso_results <- tune_grid(lasso_wf,
+                           resamples = df_10foldcv,
+                           grid = lambda_grid,
+                           metrics = metric_set(rmse))
+best_lasso <- select_best(lasso_results, metric = "rmse")
+final_lasso <- finalize_workflow(lasso_wf, best_lasso)
+final_lasso_fit <- fit(final_lasso, data = df_train)
+# MODEL ANALYSIS
+lasso_coef_table <- tidy(final_lasso_fit) |> filter(estimate != 0)
+lasso_coef_table
+vip_lasso <- vip(final_lasso_fit$fit$fit, num_features = 10) +
+  labs(title = "Variable Importance by Absolute Coefficient Values, LASSO Model") + theme_bw()
+vip_lasso
+ggsave("vip_lasso.png", vip_lasso)
+# PREDICTIONS
+lasso_preds <- predict(final_lasso_fit, new_data = df_test) |>
+  bind_cols(df_test)
+lasso_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = lasso_preds$.pred)
+spotlight_preds <- lasso_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds, caption = "LASSO Model Predictions")
+rmse(lasso_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+
+```
+
+## Mixed LASSO/Ridge
+
+```{r mixed}
+set.seed(499)
+mixed_spec <- linear_reg(penalty = tune(), mixture = 0.5) |>
+  set_engine("glmnet") # mixed model
+mixed_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(mixed_spec)
+mixed_results <- tune_grid(mixed_wf,
+                           resamples = df_10foldcv,
+                           grid = lambda_grid,
+                           metrics = metric_set(rmse))
+best_mixed <- select_best(mixed_results, metric = "rmse")
+final_mixed <- finalize_workflow(mixed_wf, best_mixed)
+final_mixed_fit <- fit(final_mixed, data = df_train)
+mixed_coef_table <- tidy(final_mixed_fit) |> filter(estimate != 0)
+mixed_coef_table
+vip_mixed <- vip(final_mixed_fit$fit$fit, num_features = 10) +
+  labs(title = "Variable Importance by Absolute Coefficient Values, Mixed Model") +
+  theme_bw()
+vip_mixed
+ggsave("vip_mixed.png", vip_mixed)
+mixed_preds <- predict(final_mixed_fit, new_data = df_test) |>
+  bind_cols(df_test)
+mixed_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = mixed_preds$.pred)
+spotlight_preds_mixed <- mixed_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds_mixed, caption = "Mixed Model Predictions")
+rmse(mixed_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+```
+
+## Ridge Regression
+
+```{r ridge}
+set.seed(499)
+ridge_spec <- linear_reg(penalty = tune(), mixture = 0) |>
+  set_engine("glmnet") # mixed model
+ridge_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(ridge_spec)
+ridge_results <- tune_grid(ridge_wf,
+                           resamples = df_10foldcv,
+                           grid = lambda_grid,
+                           metrics = metric_set(rmse))
+best_ridge <- select_best(ridge_results, metric = "rmse")
+final_ridge <- finalize_workflow(ridge_wf, best_ridge)
+final_ridge_fit <- fit(final_ridge, data = df_train)
+ridge_coef_table <- tidy(final_ridge_fit) |> filter(estimate != 0)
+ridge_coef_table
+vip_ridge <- vip(final_ridge_fit$fit$fit, num_features = 10) +
+  labs(title = "Var. Impt. by Abs. Coefficient Values, Ridge Model") +
+  theme_bw()
+vip_ridge
+ggsave("vip_ridge.png", vip_ridge)
+ridge_preds <- predict(final_ridge_fit, new_data = df_test) |>
+  bind_cols(df_test)
+ridge_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = ridge_preds$.pred)
+spotlight_preds_ridge <- ridge_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds_ridge, caption = "Ridge Model Predictions")
+rmse(ridge_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+```
+
+## Boosted Tree Method
+
+```{r boostedtrees}
+set.seed(499)
+df_test
+boost_spec <- boost_tree(
+  trees = 1000,
+  learn_rate = tune(),
+  tree_depth = tune()) |> set_engine("xgboost") |> set_mode("regression")
+boost_wf <- workflow() |> add_recipe(lasso_rec) |> add_model(boost_spec)
+boost_tune_grid <- grid_regular(learn_rate(range = c(0.001, 0.25)),
+                                tree_depth(),
+                                levels = 5)
+boost_results <- tune_grid(boost_wf, resamples = df_10foldcv,
+                           grid = boost_tune_grid, metrics = metric_set(rmse))
+best_boost <- select_best(boost_results, metric = "rmse")
+final_boost <- finalize_workflow(boost_wf, best_boost)
+final_boost_fit <- fit(final_boost, data = df_train)
+vip_boost <- vip(final_boost_fit) + 
+  labs(title = "Variable Importance - Boosted Trees") + theme_bw()
+vip_boost
+#ggsave("vip_boost.png", vip_boost)
+boost_preds <- predict(final_boost_fit, new_data = df_test) |>
+  bind_cols(df_test)
+boost_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = boost_preds$.pred)
+boost_preds_df
+spotlight_preds_boost <- boost_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds_boost, caption = "Boosted Tree Model Predictions")
+rmse(boost_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+```
+
+## Bagging
+
+```{r randForest}
+set.seed(499)
+df_predictors <- ncol(df_train) - 1
+bag_spec <- rand_forest(trees = 1000, mtry = df_predictors,
+                        min_n = tune()) |>
+  set_mode("regression") |> set_engine("ranger",
+                                       importance = "permutation")
+
+# force bagging with m = p, impurity_corrected chosen due to preds w/ diff scales
+bag_fit <- bag_spec |>
+  fit(flurryAdjCareerXGoals ~., data= df_train)
+vip_bag <- vip(bag_fit) + labs(title = "Variable Importance - Bagged RF") +
+  theme_bw()
+vip_bag
+ggsave("vip_bag.png", vip_bag)
+bag_preds <- predict(bag_fit, new_data = df_test) |>
+  bind_cols(df_test)
+bag_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = bag_preds$.pred)
+spotlight_preds_bag <- bag_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds_bag, caption = "Bagging Model Predictions")
+rmse(bag_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+```
+
+## Random Forest
+
+```{r}
+set.seed(499)
+rf_spec <- rand_forest(trees = 1000,
+                       mode = "regression",
+                       mtry = sqrt(df_predictors)) |>
+  set_engine("ranger", importance = "permutation")
+rf_fit <- rf_spec |> fit(flurryAdjCareerXGoals ~., data = df_train)
+vip_rf <- vip(rf_fit) + labs(title = "Variable Importance - Random Forest") +
+  theme_bw()
+vip_rf
+#ggsave("vip_rf.png", vip_rf)
+rf_preds <- predict(rf_fit, new_data = df_test) |>
+  bind_cols(df_test)
+rf_preds_df <- bind_cols(test_ids, Actual = df_test$flurryAdjCareerXGoals,
+                            Estimate = rf_preds$.pred)
+spotlight_preds_rf <- rf_preds_df |>
+  filter(ID %in% c("2023-Paul Fischer", "2015-Caleb Jones", "2008-Zack Smith",
+                   "2013-Bo Horvat", "2013-Nathan MacKinnon",
+                   "2008-Steven Stamkos")) |>
+  summarize(ID = ID,
+            Actual = round(Actual,2),
+            Estimate = round(Estimate,2))
+kable(spotlight_preds_rf, caption = "Random Forest Model Predictions")
+rmse(rf_preds, truth = flurryAdjCareerXGoals, estimate = .pred)
+
+
+```
