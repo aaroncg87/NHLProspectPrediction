@@ -4,7 +4,7 @@ Five North American amateur leagues were analyzed for the prospects they produce
 - QMJHL (Quebec Major Junior Hockey League)
 - WHL (Western Hockey League) -- includes mostly western Canada, but some United States Pacific Northwest teams
 - ECHL (East Coast Hockey League) -- United States East Coast; but has expanded to include more teams across the United States
-- USNDTP -- United STates National Development Team Program 
+- USNDTP -- United States National Development Team Program 
 Flurry-adjusted expected goals are a statistic calculated by multiplying the probability of a shot on goal scoring by each shot.  So, the more high-quality shots a player
 takes, the higher their expected goals statistic will be.  "Flurry adjustment" simply means adjusting expected goals so that when there is a "flurry" of shots (a lot of shots
 on goal in a very short period of time), expected goals is not overinflated.  The formula for flurry adjusted expected goals is: chance of not scoring in a flurry yet * regular
