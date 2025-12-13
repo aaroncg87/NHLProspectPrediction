@@ -23,6 +23,7 @@ Three were types of decision trees
 - Bagged Foresting
 - Random Forest
 - Boosted Trees
+
 Results were mixed, with none of the models performing extremely well.  But bagged and random foresting were the most successful overall in estimating actual flurry adjusted
 career goals. This analysis could be expanded to account for more player attributes, such as skating speed and number of hits, and could also be made more nuanced to model
 for just one season or league.  It could also be expanded to predict career flurry adjusted expected goals for players from Europe and around the globe, rather than just
