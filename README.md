@@ -20,7 +20,7 @@ Six machine learning models were utilized to attempt prediction.  Three were typ
 - Ridge
 - Mixed (50-50 LASSO/Ridge)
 
-Three were types of decision trees
+Three were types of decision trees:
 - Bagged Foresting
 - Random Forest
 - Boosted Trees
