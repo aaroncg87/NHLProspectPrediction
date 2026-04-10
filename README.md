@@ -16,7 +16,7 @@ Data was compiled from four sources:
  - Elite Prospects (amateur statistics for prospects)
  - MoneyPuck (containing career flurry adjusted expected goals).
 Six machine learning models were utilized to attempt prediction.  Three were types of linear regression:
-- LASSO,
+- LASSO
 - Ridge
 - Mixed (50-50 LASSO/Ridge)
 Three were types of decision trees
